@@ -4,10 +4,6 @@ import TicketPaymentService from '../thirdparty/paymentgateway/TicketPaymentServ
 import SeatReservationService from '../thirdparty/seatbooking/SeatReservationService.js';
 
 export default class TicketService {
-  /**
-   * Should only have private methods other than the one below.
-   */
-
   paymentGateway = new TicketPaymentService();
   seatBookingService = new SeatReservationService();
 
@@ -18,10 +14,39 @@ export default class TicketService {
     }
 
     // Validate the ticket purchase requests
+    let adultTicketIncluded = false;
+    let childTicketIncluded = false;
+    let infantTicketIncluded = false;
+
     for (const request of ticketTypeRequests) {
       if (!(request instanceof TicketTypeRequest)) {
         throw new InvalidPurchaseException('Invalid ticket purchase request');
       }
+
+      const ticketType = request.getTicketType();
+      const noOfTickets = request.getNoOfTickets();
+
+      if (ticketType === 'INFANT') {
+        if (noOfTickets !== 0) {
+          throw new InvalidPurchaseException('Infant tickets cannot have a quantity greater than 0');
+        }
+        infantTicketIncluded = true;
+      } else if (ticketType === 'CHILD') {
+        if (noOfTickets === 0) {
+          throw new InvalidPurchaseException('Child tickets require a quantity greater than 0');
+        }
+        childTicketIncluded = true;
+      } else if (ticketType === 'ADULT') {
+        if (noOfTickets === 0) {
+          throw new InvalidPurchaseException('Adult tickets require a quantity greater than 0');
+        }
+        adultTicketIncluded = true;
+      }
+    }
+
+    // Check if child or infant tickets are purchased without an adult ticket
+    if ((childTicketIncluded || infantTicketIncluded) && !adultTicketIncluded) {
+      throw new InvalidPurchaseException('Child or infant tickets cannot be purchased without an adult ticket');
     }
 
     // Calculate the total amount for requested tickets
@@ -58,7 +83,5 @@ export default class TicketService {
 
     // Make a seat reservation request to the SeatReservationService
     this.seatBookingService.reserveSeat(accountId, totalSeatsToReserve);
-
-    // TODO: Implement the rest of the purchaseTickets method
   }
 }
