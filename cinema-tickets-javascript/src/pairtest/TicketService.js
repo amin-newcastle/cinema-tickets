@@ -13,6 +13,10 @@ export default class TicketService {
   }
 
   purchaseTickets(accountId, ...ticketTypeRequests) {
+    if(accountId <= 0) {
+      throw new InvalidPurchaseException('Account ID must be a positive integer');
+    }
+
     this.validatePurchaseRequests(ticketTypeRequests);
 
     let totalAmount = 0;

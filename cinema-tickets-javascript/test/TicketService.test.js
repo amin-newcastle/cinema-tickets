@@ -81,6 +81,21 @@ describe('TicketService', () => {
         .toThrow(InvalidPurchaseException);
     });
   });
+
+  describe('Validate accountId', () => {
+    const ticketTypeRequest = new TicketTypeRequest('ADULT', 1);
+    it('throws InvalidPurchaseException if accountId is less than or equal to 0', () => {
+      expect(() => {
+        ticketService.purchaseTickets(0, ticketTypeRequest);
+      }).toThrow(InvalidPurchaseException);
+    });
+  
+    it('does not throw InvalidPurchaseException if accountId is a positive number', () => {
+      expect(() => {
+        ticketService.purchaseTickets(1, ticketTypeRequest);
+      }).not.toThrow(InvalidPurchaseException);
+    });
+  });
 });
 
 describe('Third Party Services', () => {
