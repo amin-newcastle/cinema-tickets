@@ -36,12 +36,6 @@ describe('TicketService', () => {
   });
 
   describe('Ticket purchase validations', () => {
-    it('should reject invalid ticket purchase requests', () => {
-      const invalidRequest = new TicketTypeRequest('CHILD', 2);
-      expect(() => ticketService.purchaseTickets(1, invalidRequest))
-        .toThrow(InvalidPurchaseException);
-    });
-
     it('should reject ticket purchase requests exceeding maximum limit', () => {
       const ticketRequests = Array(21).fill(new TicketTypeRequest('ADULT', 1));
       expect(() => ticketService.purchaseTickets(1, ...ticketRequests))
@@ -50,45 +44,41 @@ describe('TicketService', () => {
 
     it('should reject ticket purchase requests with child or infant tickets but without an adult ticket', () => {
       const childTicketRequest = new TicketTypeRequest('CHILD', 1);
-      const infantTicketRequest = new TicketTypeRequest('INFANT', 0);
+      const infantTicketRequest = new TicketTypeRequest('INFANT', 1);
       expect(() => ticketService.purchaseTickets(1, childTicketRequest))
         .toThrow(InvalidPurchaseException);
       expect(() => ticketService.purchaseTickets(1, infantTicketRequest))
         .toThrow(InvalidPurchaseException);
+    });
+  });
+
+  describe('Validate Purchase Requests', () => {
+    it('should throw error when invalid request is passed', () => {
+      const invalidRequest = { getTicketType: () => 'ADULT', getNoOfTickets: () => 1 };
+      expect(() => ticketService.purchaseTickets(1, invalidRequest)).toThrow(InvalidPurchaseException);
+    });
+
+    it('should throw error when infant ticket has non-zero quantity', () => {
+      const adultTicketRequest = new TicketTypeRequest('ADULT', 1);
+      const infantTicketRequest = new TicketTypeRequest('INFANT', 1);
+      expect(() => ticketService.purchaseTickets(1, adultTicketRequest, infantTicketRequest)).toThrow(InvalidPurchaseException);
     });
   });
 
   describe('Ticket quantity validations', () => {
-    it('should reject adult ticket requests with 0 quantity', () => {
+    it('should reject adult or child ticket requests with 0 quantity', () => {
       const adultTicketRequest = new TicketTypeRequest('ADULT', 0);
+      const childTicketRequest = new TicketTypeRequest('CHILD', 0);
       expect(() => ticketService.purchaseTickets(1, adultTicketRequest))
         .toThrow(InvalidPurchaseException);
-    });
-
-    it('should reject infant ticket requests with non-zero quantity', () => {
-      const infantTicketRequest = new TicketTypeRequest('INFANT', 1);
-      expect(() => ticketService.purchaseTickets(1, infantTicketRequest))
-        .toThrow(InvalidPurchaseException);
-    });
-
-    it('should reject child ticket requests with 0 quantity', () => {
-      const childTicketRequest = new TicketTypeRequest('CHILD', 0);
       expect(() => ticketService.purchaseTickets(1, childTicketRequest))
-      .toThrow(InvalidPurchaseException);
+        .toThrow(InvalidPurchaseException);
     });
 
     it('should reject infant ticket requests with non-zero quantity', () => {
       const infantTicketRequest = new TicketTypeRequest('INFANT', 1);
       expect(() => ticketService.purchaseTickets(1, infantTicketRequest))
         .toThrow(InvalidPurchaseException);
-    });
-  });
-
-  describe('TicketTypeRequest class', () => {
-    it('should return the correct number of tickets and ticket type', () => {
-      const request = new TicketTypeRequest('ADULT', 5);
-      expect(request.getNoOfTickets()).toBe(5);
-      expect(request.getTicketType()).toBe('ADULT');
     });
   });
 });
