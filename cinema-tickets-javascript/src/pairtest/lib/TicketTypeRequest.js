@@ -1,6 +1,3 @@
-/**
- * Immutable Object.
- */
 
 export default class TicketTypeRequest {
   #type;
