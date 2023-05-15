@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1684104710969" clover="3.2.0">
+  <project timestamp="1684104710970" name="All files">
+    <metrics statements="9" coveredstatements="5" conditionals="4" coveredconditionals="2" methods="4" coveredmethods="2" elements="17" coveredelements="9" complexity="0" loc="9" ncloc="9" packages="2" files="3" classes="3"/>
+    <package name="pairtest">
+      <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+      <file name="TicketService.js" path="C:\Users\Amin\Documents\Coding\cinema-tickets\cinema-tickets-javascript\src\pairtest\TicketService.js">
+        <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+      </file>
+    </package>
+    <package name="pairtest.lib">
+      <metrics statements="9" coveredstatements="5" conditionals="4" coveredconditionals="2" methods="3" coveredmethods="1"/>
+      <file name="InvalidPurchaseException.js" path="C:\Users\Amin\Documents\Coding\cinema-tickets\cinema-tickets-javascript\src\pairtest\lib\InvalidPurchaseException.js">
+        <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      </file>
+      <file name="TicketTypeRequest.js" path="C:\Users\Amin\Documents\Coding\cinema-tickets\cinema-tickets-javascript\src\pairtest\lib\TicketTypeRequest.js">
+        <metrics statements="9" coveredstatements="5" conditionals="4" coveredconditionals="2" methods="3" coveredmethods="1"/>
+        <line num="11" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="12" count="0" type="stmt"/>
+        <line num="15" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="16" count="0" type="stmt"/>
+        <line num="19" count="1" type="stmt"/>
+        <line num="20" count="1" type="stmt"/>
+        <line num="24" count="0" type="stmt"/>
+        <line num="28" count="0" type="stmt"/>
+        <line num="31" count="1" type="stmt"/>
+      </file>
+    </package>
+  </project>
+</coverage>

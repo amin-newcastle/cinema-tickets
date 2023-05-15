@@ -8,5 +8,8 @@ export default class TicketService {
 
   purchaseTickets(accountId, ...ticketTypeRequests) {
     // throws InvalidPurchaseException
+    // TODO: Implement the purchaseTickets method
+
+
   }
 }
