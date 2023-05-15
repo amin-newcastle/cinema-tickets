@@ -1,4 +1,4 @@
-import TicketService from '../src/TicketService.js';
+import TicketService from '../src/pairtest/TicketService.js';
 import TicketTypeRequest from '../src/pairtest/lib/TicketTypeRequest.js';
 import InvalidPurchaseException from '../src/pairtest/lib/InvalidPurchaseException.js';
 
@@ -26,6 +26,8 @@ describe('TicketService', () => {
 
     // Call the purchaseTickets method
     ticketService.purchaseTickets(1, ...ticketRequests);
+
+    
 
     // Verify the payment request
     expect(paymentMock).toHaveBeenCalledWith(1, 70); // Total amount = 2 * 20 (ADULT) + 3 * 10 (CHILD) = 70
@@ -70,4 +72,30 @@ describe('TicketService', () => {
       ticketService.purchaseTickets(1, validRequest);
     }).not.toThrow(InvalidPurchaseException);
   });
+
+  it('should throw an error for invalid ticket type', () => {
+    const invalidRequest = new TicketTypeRequest('INVALID', 2);
+  
+    expect(() => {
+      ticketService.purchaseTickets(1, invalidRequest);
+    }).toThrow(InvalidPurchaseException);
+  });
+
+  it('should return the correct number of tickets and ticket type', () => {
+    const request = new TicketTypeRequest('ADULT', 5);
+  
+    expect(request.getNoOfTickets()).toBe(5);
+    expect(request.getTicketType()).toBe('ADULT');
+  });
+  
+  it('should throw an error for an invalid ticket type in the constructor', () => {
+    expect(() => {
+      new TicketTypeRequest('INVALID', 2);
+    }).toThrow(TypeError);
+    expect(() => {
+      new TicketTypeRequest('ADULT', 2.5);
+    }).toThrow(TypeError);
+  });
+   
+  
 });

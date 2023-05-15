@@ -7,7 +7,7 @@
   },
   "type": "module",
   "scripts": {
-    "test": "jest --coverage"
+    "test": "jest --collect-coverage"
   },
   "devDependencies": {
     "@babel/core": "^7.21.8",
