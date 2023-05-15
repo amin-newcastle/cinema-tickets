@@ -27,9 +27,6 @@ export default class TicketService {
       const noOfTickets = request.getNoOfTickets();
 
       if (ticketType === 'INFANT') {
-        if (noOfTickets !== 0) {
-          throw new InvalidPurchaseException('Infant tickets cannot have a quantity greater than 0');
-        }
         infantTicketIncluded = true;
       } else if (ticketType === 'CHILD') {
         if (noOfTickets === 0) {
@@ -51,6 +48,8 @@ export default class TicketService {
 
     // Calculate the total amount for requested tickets
     let totalAmount = 0;
+    let totalSeatsToReserve = 0; // New variable to track seat reservation
+
     for (const request of ticketTypeRequests) {
       const ticketType = request.getTicketType();
       const noOfTickets = request.getNoOfTickets();
@@ -58,12 +57,17 @@ export default class TicketService {
       switch (ticketType) {
         case 'INFANT':
           // Infants do not pay for a ticket
+          if (noOfTickets !== 0) {
+            throw new InvalidPurchaseException('Infant tickets can only have a quantity of 0');
+          }
           break;
         case 'CHILD':
           totalAmount += noOfTickets * 10;
+          totalSeatsToReserve += noOfTickets;
           break;
         case 'ADULT':
           totalAmount += noOfTickets * 20;
+          totalSeatsToReserve += noOfTickets;
           break;
         default:
           throw new InvalidPurchaseException('Invalid ticket type');
@@ -72,14 +76,6 @@ export default class TicketService {
 
     // Make a payment request to the TicketPaymentService
     this.paymentGateway.makePayment(accountId, totalAmount);
-
-    // Calculate the total number of seats to reserve
-    let totalSeatsToReserve = 0;
-    for (const request of ticketTypeRequests) {
-      if (request.getTicketType() !== 'INFANT') {
-        totalSeatsToReserve += request.getNoOfTickets();
-      }
-    }
 
     // Make a seat reservation request to the SeatReservationService
     this.seatBookingService.reserveSeat(accountId, totalSeatsToReserve);

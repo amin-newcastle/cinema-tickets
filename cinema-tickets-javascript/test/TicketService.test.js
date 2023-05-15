@@ -1,12 +1,16 @@
 import TicketService from '../src/pairtest/TicketService.js';
 import TicketTypeRequest from '../src/pairtest/lib/TicketTypeRequest.js';
 import InvalidPurchaseException from '../src/pairtest/lib/InvalidPurchaseException.js';
+import TicketPaymentService from '../src/thirdparty/paymentgateway/TicketPaymentService.js';
 
 describe('TicketService', () => {
   let ticketService;
+  let paymentService;
 
   beforeEach(() => {
     ticketService = new TicketService();
+    paymentService = new TicketPaymentService();
+    ticketService.paymentGateway = paymentService;
   });
 
   describe('Payment and reservation calculations', () => {
@@ -71,6 +75,12 @@ describe('TicketService', () => {
       expect(() => ticketService.purchaseTickets(1, childTicketRequest))
       .toThrow(InvalidPurchaseException);
     });
+
+    it('should reject infant ticket requests with non-zero quantity', () => {
+      const infantTicketRequest = new TicketTypeRequest('INFANT', 1);
+      expect(() => ticketService.purchaseTickets(1, infantTicketRequest))
+        .toThrow(InvalidPurchaseException);
+    });
   });
 
   describe('TicketTypeRequest class', () => {
@@ -78,6 +88,23 @@ describe('TicketService', () => {
       const request = new TicketTypeRequest('ADULT', 5);
       expect(request.getNoOfTickets()).toBe(5);
       expect(request.getTicketType()).toBe('ADULT');
+    });
+  });
+
+  describe('makePayment', () => {
+    it('should make a payment request with the correct account ID and amount', () => {
+      const accountId = 123;
+      const adultTicketRequest = new TicketTypeRequest('ADULT', 2);
+      const ticketRequests = [adultTicketRequest];
+      const pricePerTicket = 20;
+      const expectedAmount = adultTicketRequest.getNoOfTickets() * pricePerTicket;
+  
+      const paymentRequestMock = jest.fn();
+      paymentService.makePayment = paymentRequestMock;
+  
+      ticketService.purchaseTickets(accountId, ...ticketRequests);
+  
+      expect(paymentRequestMock).toHaveBeenCalledWith(accountId, expectedAmount);
     });
   });
 });
