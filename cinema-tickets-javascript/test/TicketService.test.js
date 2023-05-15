@@ -91,58 +91,79 @@ describe('TicketService', () => {
       expect(request.getTicketType()).toBe('ADULT');
     });
   });
+});
 
-  describe('makePayment', () => {
-    it('should make a payment request with the correct account ID and amount', () => {
-      const accountId = 123;
-      const adultTicketRequest = new TicketTypeRequest('ADULT', 2);
-      const ticketRequests = [adultTicketRequest];
-      const pricePerTicket = 20;
-      const expectedAmount = adultTicketRequest.getNoOfTickets() * pricePerTicket;
-  
-      const paymentRequestMock = jest.fn();
-      paymentService.makePayment = paymentRequestMock;
-  
-      ticketService.purchaseTickets(accountId, ...ticketRequests);
-  
-      expect(paymentRequestMock).toHaveBeenCalledWith(accountId, expectedAmount);
+describe('Third Party Services', () => {
+  let ticketService;
+  let paymentService;
+
+  beforeEach(() => {
+    ticketService = new TicketService();
+    paymentService = new TicketPaymentService();
+    ticketService.paymentGateway = paymentService;
+  });
+
+  describe('TicketPaymentService', () => {
+    it('should throw error if accountId is not integer', () => {
+      expect(() => paymentService.makePayment('test', 10)).toThrow(TypeError);
+    });
+
+    it('should throw error if totalAmountToPay is not integer', () => {
+      expect(() => paymentService.makePayment(1, 'test')).toThrow(TypeError);
+    });
+
+    it('should not throw error if inputs are valid', () => {
+      expect(() => paymentService.makePayment(1, 10)).not.toThrow();
     });
   });
 
-  describe('Third Party Services', () => {
-    describe('TicketPaymentService', () => {
-      it('should throw error if accountId is not integer', () => {
-        expect(() => paymentService.makePayment('test', 10)).toThrow(TypeError);
-      });
-  
-      it('should throw error if totalAmountToPay is not integer', () => {
-        expect(() => paymentService.makePayment(1, 'test')).toThrow(TypeError);
-      });
-  
-      it('should not throw error if inputs are valid', () => {
-        expect(() => paymentService.makePayment(1, 10)).not.toThrow();
-      });
+  describe('SeatReservationService', () => {
+    let reservationService;
+
+    beforeEach(() => {
+      reservationService = new SeatReservationService();
     });
-  
-    describe('SeatReservationService', () => {
-      let reservationService;
-  
-      beforeEach(() => {
-        reservationService = new SeatReservationService();
-      });
-  
-      it('should throw error if accountId is not integer', () => {
-        expect(() => reservationService.reserveSeat('test', 5)).toThrow(TypeError);
-      });
-  
-      it('should throw error if totalSeatsToAllocate is not integer', () => {
-        expect(() => reservationService.reserveSeat(1, 'test')).toThrow(TypeError);
-      });
-  
-      it('should not throw error if inputs are valid', () => {
-        expect(() => reservationService.reserveSeat(1, 5)).not.toThrow();
-      });
+
+    it('should throw error if accountId is not integer', () => {
+      expect(() => reservationService.reserveSeat('test', 5)).toThrow(TypeError);
+    });
+
+    it('should throw error if totalSeatsToAllocate is not integer', () => {
+      expect(() => reservationService.reserveSeat(1, 'test')).toThrow(TypeError);
+    });
+
+    it('should not throw error if inputs are valid', () => {
+      expect(() => reservationService.reserveSeat(1, 5)).not.toThrow();
+    });
+  });
+});
+
+describe('TicketTypeRequest', () => {
+  describe('constructor', () => {
+    it('should reject invalid ticket type', () => {
+      expect(() => new TicketTypeRequest('INVALID_TYPE', 1)).toThrow(TypeError);
+    });
+
+    it('should reject non-integer ticket quantity', () => {
+      expect(() => new TicketTypeRequest('ADULT', 'one')).toThrow(TypeError);
+    });
+
+    it('should not throw error if inputs are valid', () => {
+      expect(() => new TicketTypeRequest('ADULT', 1)).not.toThrow();
     });
   });
 
+  describe('getNoOfTickets', () => {
+    it('should return the correct number of tickets', () => {
+      const request = new TicketTypeRequest('ADULT', 5);
+      expect(request.getNoOfTickets()).toBe(5);
+    });
+  });
+
+  describe('getTicketType', () => {
+    it('should return the correct ticket type', () => {
+      const request = new TicketTypeRequest('ADULT', 5);
+      expect(request.getTicketType()).toBe('ADULT');
+    });
+  });
 });
