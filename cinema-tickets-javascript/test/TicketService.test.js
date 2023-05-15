@@ -2,6 +2,7 @@ import TicketService from '../src/pairtest/TicketService.js';
 import TicketTypeRequest from '../src/pairtest/lib/TicketTypeRequest.js';
 import InvalidPurchaseException from '../src/pairtest/lib/InvalidPurchaseException.js';
 import TicketPaymentService from '../src/thirdparty/paymentgateway/TicketPaymentService.js';
+import SeatReservationService from '../src/thirdparty/seatbooking/SeatReservationService.js';
 
 describe('TicketService', () => {
   let ticketService;
@@ -107,4 +108,41 @@ describe('TicketService', () => {
       expect(paymentRequestMock).toHaveBeenCalledWith(accountId, expectedAmount);
     });
   });
+
+  describe('Third Party Services', () => {
+    describe('TicketPaymentService', () => {
+      it('should throw error if accountId is not integer', () => {
+        expect(() => paymentService.makePayment('test', 10)).toThrow(TypeError);
+      });
+  
+      it('should throw error if totalAmountToPay is not integer', () => {
+        expect(() => paymentService.makePayment(1, 'test')).toThrow(TypeError);
+      });
+  
+      it('should not throw error if inputs are valid', () => {
+        expect(() => paymentService.makePayment(1, 10)).not.toThrow();
+      });
+    });
+  
+    describe('SeatReservationService', () => {
+      let reservationService;
+  
+      beforeEach(() => {
+        reservationService = new SeatReservationService();
+      });
+  
+      it('should throw error if accountId is not integer', () => {
+        expect(() => reservationService.reserveSeat('test', 5)).toThrow(TypeError);
+      });
+  
+      it('should throw error if totalSeatsToAllocate is not integer', () => {
+        expect(() => reservationService.reserveSeat(1, 'test')).toThrow(TypeError);
+      });
+  
+      it('should not throw error if inputs are valid', () => {
+        expect(() => reservationService.reserveSeat(1, 5)).not.toThrow();
+      });
+    });
+  });
+
 });
